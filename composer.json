@@ -48,6 +48,7 @@
             "Laraish\\Foundation\\ComposerScripts::renameHelperFunctions"
         ],
         "post-autoload-dump": [
+		"Laraish\\Foundation\\ComposerScripts::renameHelperFunctions",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover"
         ]
