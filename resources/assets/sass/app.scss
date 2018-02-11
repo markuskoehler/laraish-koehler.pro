@@ -1,5 +1,5 @@
 // Fonts
-@import url(https://fonts.googleapis.com/css?family=Raleway:100,300,400,600);
+//@import url(https://fonts.googleapis.com/css?family=Raleway:100,300,400,600);
 
 // reset
 * {
@@ -24,7 +24,7 @@ html, body {
 }
 
 // generic class
-.site {
+/*.site {
     width: 960px;
     max-width: 100%;
     margin: auto;
@@ -77,7 +77,7 @@ html, body {
 
 .text--center {
     text-align: center;
-}
+}*/
 
 // Page style
 .article__header {
@@ -95,4 +95,13 @@ html, body {
     width: 100%;
     height: auto;
     margin-bottom: 2em;
+}
+
+.navbar-brand {
+    line-height: 20px;
+    font-size: 11px !important;
+}
+
+.navbar-brand span.slogan {
+    vertical-align: middle;
 }
