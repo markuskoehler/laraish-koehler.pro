@@ -10,5 +10,5 @@ use Laraish\Foundation\Debugger\ViewDebugger;
 
 class Controller extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;//, ViewDebugger;
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ViewDebugger;
 }
