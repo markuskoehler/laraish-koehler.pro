@@ -32,6 +32,9 @@
     <link rel="shortcut icon" href="{{ public_url('images/favicon.ico') }}" type="image/vnd.microsoft.icon"/>
     <link rel="apple-touch-icon-precomposed" href="{{ public_url('images/apple-touch-icon-precomposed.png') }}">
     <meta name="theme-color" content="#ffffff">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!--
     Stylesheets
     =============================================
@@ -68,7 +71,7 @@
     </script>
 @endif
 
-<main>
+<main id="app">
     <div class="page-loader">
         <div class="loader">Loading...</div>
     </div>
