@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=10, user-scalable=no, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, minimum-scale=1, maximum-scale=10, user-scalable=no, initial-scale=1.0">
     <!--
     Document Title
     =============================================
@@ -82,133 +83,92 @@
         register_nav_menu( 'primary-menu', __( 'Primary Menu' ) );
     }
             class themeslug_walker_nav_menu extends Walker_Nav_Menu {
+                // add classes to ul sub-menus
+                function start_lvl( &$output, $depth = 0, $args = array() ) {
+                    // depth dependent classes
+                    $indent = ( $depth > 0  ? str_repeat( "\t", $depth ) : '' ); // code indent
+                    $display_depth = ( $depth + 1); // because it counts the first submenu as 0
+                    $classes = array(
+                        'sub-menu',
+                        'dropdown-menu',
+                        ( $display_depth % 2  ? 'menu-odd' : 'menu-even' ),
+                        ( $display_depth >=2 ? 'sub-sub-menu' : '' ),
+                        'menu-depth-' . $display_depth
+                        );
+                    $class_names = implode( ' ', $classes );
 
-        // add classes to ul sub-menus
-        function start_lvl( &$output, $depth = 0, $args = array() ) {
-            // depth dependent classes
-            $indent = ( $depth > 0  ? str_repeat( "\t", $depth ) : '' ); // code indent
-            $display_depth = ( $depth + 1); // because it counts the first submenu as 0
-            $classes = array(
-                'sub-menu',
-                'dropdown-menu',
-                ( $display_depth % 2  ? 'menu-odd' : 'menu-even' ),
-                ( $display_depth >=2 ? 'sub-sub-menu' : '' ),
-                'menu-depth-' . $display_depth
-                );
-            $class_names = implode( ' ', $classes );
+                    // build html
+                    $output .= "\n" . $indent . '<ul class="' . $class_names . '">' . "\n";
+                }
 
-            // build html
-            $output .= "\n" . $indent . '<ul class="' . $class_names . '">' . "\n";
+                // add main/sub classes to li's and links
+                 function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
+                    global $wp_query;
+
+                    $indent = ( $depth > 0 ? str_repeat( "\t", $depth ) : '' ); // code indent
+
+                    // depth dependent classes
+                    $depth_classes = array(
+                        ( $depth == 0 ? 'dropdown' : 'dropdown' ),
+                        ( $depth >=2 ? 'sub-sub-menu-item' : '' ),
+                        ( $depth % 2 ? 'menu-item-odd' : 'menu-item-even' ),
+                        'menu-item-depth-' . $depth
+                    );
+                    $depth_class_names = esc_attr( implode( ' ', $depth_classes ) );
+
+                    // passed classes
+                    $classes = empty( $item->classes ) ? array() : (array) $item->classes;
+                    $class_names = esc_attr( implode( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item ) ) );
+
+                    // build html
+                    $output .= $indent . '<li id="nav-menu-item-'. $item->ID . '" class="' . $depth_class_names . ' ' . $class_names . '">';
+
+                    // link attributes
+                    $attributes  = ! empty( $item->attr_title ) ? ' title="'  . esc_attr( $item->attr_title ) .'"' : '';
+                    $attributes .= ! empty( $item->target )     ? ' target="' . esc_attr( $item->target     ) .'"' : '';
+                    $attributes .= ! empty( $item->xfn )        ? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
+                    if($args->walker->has_children) {
+                        $attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '#';
+                        $attributes .= ' class="dropdown-toggle menu-link ' . ( $depth > 0 ? 'sub-menu-link' : 'main-menu-link' ) . '" data-toggle="dropdown"';
+                    } else {
+                        // todo # for parent
+                        $attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '';
+                        // todo dropdown-toggle for parents
+                        $attributes .= ' class="menu-link ' . ( $depth > 0 ? 'sub-menu-link' : 'main-menu-link' ) . '"';
+                    }
+
+                    $item_output = sprintf( '%1$s<a%2$s>%3$s%4$s%5$s</a>%6$s',
+                        $args->before,
+                        $attributes,
+                        $args->link_before,
+                        apply_filters( 'the_title', $item->title, $item->ID ),
+                        $args->link_after,
+                        $args->after
+                    );
+
+                    // build html
+                    $output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
+                }
         }
-
-        // add main/sub classes to li's and links
-         function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
-            global $wp_query;
-
-            $indent = ( $depth > 0 ? str_repeat( "\t", $depth ) : '' ); // code indent
-
-            // depth dependent classes
-            $depth_classes = array(
-                ( $depth == 0 ? 'dropdown' : 'dropdown' ),
-                ( $depth >=2 ? 'sub-sub-menu-item' : '' ),
-                ( $depth % 2 ? 'menu-item-odd' : 'menu-item-even' ),
-                'menu-item-depth-' . $depth
-            );
-            $depth_class_names = esc_attr( implode( ' ', $depth_classes ) );
-
-            // passed classes
-            $classes = empty( $item->classes ) ? array() : (array) $item->classes;
-            $class_names = esc_attr( implode( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item ) ) );
-
-            // build html
-            $output .= $indent . '<li id="nav-menu-item-'. $item->ID . '" class="' . $depth_class_names . ' ' . $class_names . '">';
-
-            // link attributes
-            $attributes  = ! empty( $item->attr_title ) ? ' title="'  . esc_attr( $item->attr_title ) .'"' : '';
-            $attributes .= ! empty( $item->target )     ? ' target="' . esc_attr( $item->target     ) .'"' : '';
-            $attributes .= ! empty( $item->xfn )        ? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
-            if($args->walker->has_children) {
-                $attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '#';
-                $attributes .= ' class="dropdown-toggle menu-link ' . ( $depth > 0 ? 'sub-menu-link' : 'main-menu-link' ) . '" data-toggle="dropdown"';
-            } else {
-                // todo # for parent
-                $attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '';
-                // todo dropdown-toggle for parents
-                $attributes .= ' class="menu-link ' . ( $depth > 0 ? 'sub-menu-link' : 'main-menu-link' ) . '"';
-            }
-
-            $item_output = sprintf( '%1$s<a%2$s>%3$s%4$s%5$s</a>%6$s',
-                $args->before,
-                $attributes,
-                $args->link_before,
-                apply_filters( 'the_title', $item->title, $item->ID ),
-                $args->link_after,
-                $args->after
-            );
-
-            // build html
-            $output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
-        }
-
-        /*function menu_set_dropdown( $sorted_menu_items, $args ) {
-    $last_top = 0;
-    foreach ( $sorted_menu_items as $key => $obj ) {
-        // it is a top lv item?
-        if ( 0 == $obj->menu_item_parent ) {
-            // set the key of the parent
-            $last_top = $key;
-        } else {
-            $sorted_menu_items[$last_top]->classes['dropdown'] = 'dropdown';
-        }
-    }
-    return $sorted_menu_items;
-}
-        add_filter( 'wp_nav_menu_objects', 'menu_set_dropdown', 10, 2 );*/
-        }
-
-    /**
- * Add a parent CSS class for nav menu items.
- *
- * @param array  $items The menu items, sorted by each menu item's menu order.
- * @return array (maybe) modified parent CSS class.
- */
-function wpdocs_add_menu_parent_class( $items ) {
-    $parents = array();
-
-    // Collect menu items with parents.
-    foreach ( $items as $item ) {
-        if ( $item->menu_item_parent && $item->menu_item_parent > 0 ) {
-            $parents[] = $item->menu_item_parent;
-        }
-    }
-
-    // Add class.
-    foreach ( $items as $item ) {
-        if ( in_array( $item->ID, $parents ) ) {
-            $item->classes[] = 'menu-parent-item';
-        }
-    }
-    return $items;
-}
-add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
     @endphp
     <nav class="navbar navbar-custom navbar-fixed-top navbar-transparent" role="navigation">
         <div class="container">
             <div class="navbar-header">
-                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="index.html">Titan</a>
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+                <span class="navbar-brand"><a href="{{url('/')}}"><img src="{{public_url('images/mkit-dots.fw.png')}}" alt="Markus Koehler IT Services"></a><span class="slogan">&nbsp;All your web needs.</span></span>
             </div>
             <div class="collapse navbar-collapse" id="custom-collapse">
-    {{
-    wp_nav_menu( array(
-		//'theme_location' => 'top',
-		//'menu_id'        => 'top-menu',
-		'menu_class'    => 'nav navbar-nav navbar-right',
-		'container'     => '',
-		//'container_id'     => 'custom-collapse',
-		//'container_class'     => 'navbar navbar-custom navbar-fixed-top navbar-transparent',
-		'walker' => new themeslug_walker_nav_menu()
-	) )
-    }}
+                {{
+                wp_nav_menu( array(
+                    //'theme_location' => 'top',
+                    //'menu_id'        => 'top-menu',
+                    'menu_class'    => 'nav navbar-nav navbar-right',
+                    'container'     => '',
+                    //'container_id'     => 'custom-collapse',
+                    //'container_class'     => 'navbar navbar-custom navbar-fixed-top navbar-transparent',
+                    'walker' => new themeslug_walker_nav_menu()
+                ) )
+                }}
             </div>
         </div>
     </nav>
@@ -510,12 +470,14 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
             </div>
         </div>
     </nav>--}}
-    <section class="home-section home-parallax home-fade home-full-height bg-dark-60 agency-page-header" id="home" data-background="{{public_url('assets/images/agency/agency_bg.jpg')}}">
+    <section class="home-section home-parallax home-fade home-full-height bg-dark-60 agency-page-header" id="home"
+             data-background="{{public_url('assets/images/agency/agency_bg.jpg')}}">
         <div class="titan-caption">
             <div class="caption-content">
                 <div class="font-alt mb-30 titan-title-size-1">Grow your awesome idea</div>
                 <div class="font-alt mb-40 titan-title-size-3">Make business <span class="rotate">easy | simple | flexible</span>
-                </div><a class="section-scroll btn btn-border-w btn-circle" href="#about">Learn More</a>
+                </div>
+                <a class="section-scroll btn btn-border-w btn-circle" href="#about">Learn More</a>
             </div>
         </div>
     </section>
@@ -526,25 +488,29 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
                             <div class="features-icon"><span class="icon-lightbulb"></span></div>
-                            <h3 class="features-title font-alt">Ideas and concepts</h3>Careful attention to detail and clean, well structured code ensures a smooth user experience for all your visitors.
+                            <h3 class="features-title font-alt">Ideas and concepts</h3>Careful attention to detail and
+                            clean, well structured code ensures a smooth user experience for all your visitors.
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
                             <div class="features-icon"><span class="icon-tools"></span></div>
-                            <h3 class="features-title font-alt">Designs &amp; interfaces</h3>Careful attention to detail and clean, well structured code ensures a smooth user experience for all your visitors.
+                            <h3 class="features-title font-alt">Designs &amp; interfaces</h3>Careful attention to detail
+                            and clean, well structured code ensures a smooth user experience for all your visitors.
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
                             <div class="features-icon"><span class="icon-tools-2"></span></div>
-                            <h3 class="features-title font-alt">Coding &amp; development</h3>Careful attention to detail and clean, well structured code ensures a smooth user experience for all your visitors.
+                            <h3 class="features-title font-alt">Coding &amp; development</h3>Careful attention to detail
+                            and clean, well structured code ensures a smooth user experience for all your visitors.
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
                             <div class="features-icon"><span class="icon-lifesaver"></span></div>
-                            <h3 class="features-title font-alt">Dedicated support</h3>Careful attention to detail and clean, well structured code ensures a smooth user experience for all your visitors.
+                            <h3 class="features-title font-alt">Dedicated support</h3>Careful attention to detail and
+                            clean, well structured code ensures a smooth user experience for all your visitors.
                         </div>
                     </div>
                 </div>
@@ -557,9 +523,15 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                     <div class="row">
                         <div class="col-sm-12">
                             <h2 class="module-title font-alt align-left">About Us</h2>
-                            <div class="module-subtitle font-serif align-left">A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.</div>
-                            <p>The European languages are members of the same family. Their separate existence is a myth. For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ in their grammar, their pronunciation and their most common words.</p>
-                            <p>The European languages are members of the same family. Their separate existence is a myth. For science, music, sport, etc, Europe uses the same vocabulary.</p>
+                            <div class="module-subtitle font-serif align-left">A wonderful serenity has taken possession
+                                of my entire soul, like these sweet mornings of spring which I enjoy with my whole
+                                heart.
+                            </div>
+                            <p>The European languages are members of the same family. Their separate existence is a
+                                myth. For science, music, sport, etc, Europe uses the same vocabulary. The languages
+                                only differ in their grammar, their pronunciation and their most common words.</p>
+                            <p>The European languages are members of the same family. Their separate existence is a
+                                myth. For science, music, sport, etc, Europe uses the same vocabulary.</p>
                         </div>
                     </div>
                 </div>
@@ -579,50 +551,66 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                     <div class="col-sm-12">
                         <ul class="filter font-alt" id="filters">
                             <li><a class="current wow fadeInUp" href="#" data-filter="*">All</a></li>
-                            <li><a class="wow fadeInUp" href="#" data-filter=".illustration" data-wow-delay="0.2s">Illustration</a></li>
-                            <li><a class="wow fadeInUp" href="#" data-filter=".marketing" data-wow-delay="0.4s">Marketing</a></li>
-                            <li><a class="wow fadeInUp" href="#" data-filter=".photography" data-wow-delay="0.6s">Photography</a></li>
-                            <li><a class="wow fadeInUp" href="#" data-filter=".webdesign" data-wow-delay="0.6s">Web Design</a></li>
+                            <li><a class="wow fadeInUp" href="#" data-filter=".illustration" data-wow-delay="0.2s">Illustration</a>
+                            </li>
+                            <li><a class="wow fadeInUp" href="#" data-filter=".marketing" data-wow-delay="0.4s">Marketing</a>
+                            </li>
+                            <li><a class="wow fadeInUp" href="#" data-filter=".photography" data-wow-delay="0.6s">Photography</a>
+                            </li>
+                            <li><a class="wow fadeInUp" href="#" data-filter=".webdesign" data-wow-delay="0.6s">Web
+                                    Design</a></li>
                         </ul>
                     </div>
                 </div>
                 <ul class="works-grid works-grid-gut works-grid-3 works-hover-d" id="works-grid">
                     <li class="work-item illustration webdesign"><a href="portfolio_single_featured_image1.html">
-                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio1.jpg" alt="Portfolio Item"/></div>
+                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio1.jpg"
+                                                         alt="Portfolio Item"/></div>
                             <div class="work-caption font-alt">
                                 <h3 class="work-title">Corporate Identity</h3>
                                 <div class="work-descr">Illustration</div>
-                            </div></a></li>
+                            </div>
+                        </a></li>
                     <li class="work-item marketing photography"><a href="portfolio_single_featured_image2.html">
-                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio2.jpg" alt="Portfolio Item"/></div>
+                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio2.jpg"
+                                                         alt="Portfolio Item"/></div>
                             <div class="work-caption font-alt">
                                 <h3 class="work-title">Bag MockUp</h3>
                                 <div class="work-descr">Marketing</div>
-                            </div></a></li>
+                            </div>
+                        </a></li>
                     <li class="work-item illustration photography"><a href="portfolio_single_featured_slider1.html">
-                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio3.jpg" alt="Portfolio Item"/></div>
+                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio3.jpg"
+                                                         alt="Portfolio Item"/></div>
                             <div class="work-caption font-alt">
                                 <h3 class="work-title">Disk Cover</h3>
                                 <div class="work-descr">Illustration</div>
-                            </div></a></li>
+                            </div>
+                        </a></li>
                     <li class="work-item marketing photography"><a href="portfolio_single_featured_slider2.htmll">
-                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio4.jpg" alt="Portfolio Item"/></div>
+                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio4.jpg"
+                                                         alt="Portfolio Item"/></div>
                             <div class="work-caption font-alt">
                                 <h3 class="work-title">Business Card</h3>
                                 <div class="work-descr">Photography</div>
-                            </div></a></li>
+                            </div>
+                        </a></li>
                     <li class="work-item illustration webdesign"><a href="portfolio_single_featured_video1.html">
-                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio5.jpg" alt="Portfolio Item"/></div>
+                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio5.jpg"
+                                                         alt="Portfolio Item"/></div>
                             <div class="work-caption font-alt">
                                 <h3 class="work-title">Web Design</h3>
                                 <div class="work-descr">Webdesign</div>
-                            </div></a></li>
+                            </div>
+                        </a></li>
                     <li class="work-item marketing webdesign"><a href="portfolio_single_featured_video2.html">
-                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio6.jpg" alt="Portfolio Item"/></div>
+                            <div class="work-image"><img src="assets/images/portfolio/grid-portfolio6.jpg"
+                                                         alt="Portfolio Item"/></div>
                             <div class="work-caption font-alt">
                                 <h3 class="work-title">Paper clip</h3>
                                 <div class="work-descr">Marketing</div>
-                            </div></a></li>
+                            </div>
+                        </a></li>
                 </ul>
             </div>
         </section>
@@ -636,7 +624,9 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                         </div>
                     </div>
                     <div class="col-sm-6 col-md-4 col-lg-2">
-                        <div class="callout-btn-box"><a class="btn btn-w btn-round" href="portfolio_boxed_gutter_col_3.html">Lets view portfolio</a></div>
+                        <div class="callout-btn-box"><a class="btn btn-w btn-round"
+                                                        href="portfolio_boxed_gutter_col_3.html">Lets view portfolio</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -646,7 +636,9 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                 <div class="row">
                     <div class="col-sm-6 col-sm-offset-3">
                         <h2 class="module-title font-alt">Meet Our Team</h2>
-                        <div class="module-subtitle font-serif">A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.</div>
+                        <div class="module-subtitle font-serif">A wonderful serenity has taken possession of my entire
+                            soul, like these sweet mornings of spring which I enjoy with my whole heart.
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -655,8 +647,12 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                             <div class="team-image"><img src="assets/images/team-1.jpg" alt="Member Photo"/>
                                 <div class="team-detail">
                                     <h5 class="font-alt">Hi all</h5>
-                                    <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus, a&amp;nbsp;iaculis diam.</p>
-                                    <div class="team-social"><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-skype"></i></a></div>
+                                    <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus,
+                                        a&amp;nbsp;iaculis diam.</p>
+                                    <div class="team-social"><a href="#"><i class="fa fa-facebook"></i></a><a
+                                                href="#"><i class="fa fa-twitter"></i></a><a href="#"><i
+                                                    class="fa fa-dribbble"></i></a><a href="#"><i
+                                                    class="fa fa-skype"></i></a></div>
                                 </div>
                             </div>
                             <div class="team-descr font-alt">
@@ -670,8 +666,12 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                             <div class="team-image"><img src="assets/images/team-2.jpg" alt="Member Photo"/>
                                 <div class="team-detail">
                                     <h5 class="font-alt">Good day</h5>
-                                    <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus, a&amp;nbsp;iaculis diam.</p>
-                                    <div class="team-social"><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-skype"></i></a></div>
+                                    <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus,
+                                        a&amp;nbsp;iaculis diam.</p>
+                                    <div class="team-social"><a href="#"><i class="fa fa-facebook"></i></a><a
+                                                href="#"><i class="fa fa-twitter"></i></a><a href="#"><i
+                                                    class="fa fa-dribbble"></i></a><a href="#"><i
+                                                    class="fa fa-skype"></i></a></div>
                                 </div>
                             </div>
                             <div class="team-descr font-alt">
@@ -685,8 +685,12 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                             <div class="team-image"><img src="assets/images/team-4.jpg" alt="Member Photo"/>
                                 <div class="team-detail">
                                     <h5 class="font-alt">Yes, it's me</h5>
-                                    <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus, a&amp;nbsp;iaculis diam.</p>
-                                    <div class="team-social"><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-skype"></i></a></div>
+                                    <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus,
+                                        a&amp;nbsp;iaculis diam.</p>
+                                    <div class="team-social"><a href="#"><i class="fa fa-facebook"></i></a><a
+                                                href="#"><i class="fa fa-twitter"></i></a><a href="#"><i
+                                                    class="fa fa-dribbble"></i></a><a href="#"><i
+                                                    class="fa fa-skype"></i></a></div>
                                 </div>
                             </div>
                             <div class="team-descr font-alt">
@@ -707,37 +711,60 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                         <div class="panel-group" id="accordion">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title font-alt"><a data-toggle="collapse" data-parent="#accordion" href="#support1">Support Question 1</a></h4>
+                                    <h4 class="panel-title font-alt"><a data-toggle="collapse" data-parent="#accordion"
+                                                                        href="#support1">Support Question 1</a></h4>
                                 </div>
                                 <div class="panel-collapse collapse in" id="support1">
-                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.
+                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life
+                                        accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat
+                                        skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
+                                        wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
+                                        assumenda shoreditch et.
                                     </div>
                                 </div>
                             </div>
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#support2">Support Question 2</a></h4>
+                                    <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
+                                                                        data-parent="#accordion" href="#support2">Support
+                                            Question 2</a></h4>
                                 </div>
                                 <div class="panel-collapse collapse" id="support2">
-                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.
+                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life
+                                        accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat
+                                        skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
+                                        wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
+                                        assumenda shoreditch et.
                                     </div>
                                 </div>
                             </div>
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#support3">Support Question 3</a></h4>
+                                    <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
+                                                                        data-parent="#accordion" href="#support3">Support
+                                            Question 3</a></h4>
                                 </div>
                                 <div class="panel-collapse collapse" id="support3">
-                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.
+                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life
+                                        accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat
+                                        skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
+                                        wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
+                                        assumenda shoreditch et.
                                     </div>
                                 </div>
                             </div>
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#support4">Support Question 4</a></h4>
+                                    <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
+                                                                        data-parent="#accordion" href="#support4">Support
+                                            Question 4</a></h4>
                                 </div>
                                 <div class="panel-collapse collapse" id="support4">
-                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.
+                                    <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life
+                                        accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat
+                                        skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
+                                        wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
+                                        assumenda shoreditch et.
                                     </div>
                                 </div>
                             </div>
@@ -748,38 +775,45 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                         <h6 class="font-alt"><span class="icon-tools-2"></span> Development
                         </h6>
                         <div class="progress">
-                            <div class="progress-bar pb-dark" aria-valuenow="60" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="font-alt"></span></div>
+                            <div class="progress-bar pb-dark" aria-valuenow="60" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100"><span class="font-alt"></span></div>
                         </div>
                         <h6 class="font-alt"><span class="icon-strategy"></span> Branding
                         </h6>
                         <div class="progress">
-                            <div class="progress-bar pb-dark" aria-valuenow="80" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="font-alt"></span></div>
+                            <div class="progress-bar pb-dark" aria-valuenow="80" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100"><span class="font-alt"></span></div>
                         </div>
                         <h6 class="font-alt"><span class="icon-target"></span> Marketing
                         </h6>
                         <div class="progress">
-                            <div class="progress-bar pb-dark" aria-valuenow="50" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="font-alt"></span></div>
+                            <div class="progress-bar pb-dark" aria-valuenow="50" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100"><span class="font-alt"></span></div>
                         </div>
                         <h6 class="font-alt"><span class="icon-camera"></span> Photography
                         </h6>
                         <div class="progress">
-                            <div class="progress-bar pb-dark" aria-valuenow="90" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="font-alt"></span></div>
+                            <div class="progress-bar pb-dark" aria-valuenow="90" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100"><span class="font-alt"></span></div>
                         </div>
                         <h6 class="font-alt"><span class="icon-pencil"></span> Designing
                         </h6>
                         <div class="progress">
-                            <div class="progress-bar pb-dark" aria-valuenow="70" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="font-alt"></span></div>
+                            <div class="progress-bar pb-dark" aria-valuenow="70" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100"><span class="font-alt"></span></div>
                         </div>
                         <h6 class="font-alt"><span class="icon-lifesaver"></span> Dedication
                         </h6>
                         <div class="progress">
-                            <div class="progress-bar pb-dark" aria-valuenow="100" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="font-alt"></span></div>
+                            <div class="progress-bar pb-dark" aria-valuenow="100" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100"><span class="font-alt"></span></div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="module bg-dark-60 pt-0 pb-0 parallax-bg testimonial" data-background="assets/images/testimonial_bg.jpg">
+        <section class="module bg-dark-60 pt-0 pb-0 parallax-bg testimonial"
+                 data-background="assets/images/testimonial_bg.jpg">
             <div class="testimonials-slider pt-140 pb-140">
                 <ul class="slides">
                     <li>
@@ -791,7 +825,9 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                             </div>
                             <div class="row">
                                 <div class="col-sm-8 col-sm-offset-2">
-                                    <blockquote class="testimonial-text font-alt">I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine.</blockquote>
+                                    <blockquote class="testimonial-text font-alt">I am alone, and feel the charm of
+                                        existence in this spot, which was created for the bliss of souls like mine.
+                                    </blockquote>
                                 </div>
                             </div>
                             <div class="row">
@@ -815,7 +851,10 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                             </div>
                             <div class="row">
                                 <div class="col-sm-8 col-sm-offset-2">
-                                    <blockquote class="testimonial-text font-alt">I should be incapable of drawing a single stroke at the present moment; and yet I feel that I never was a greater artist than now.</blockquote>
+                                    <blockquote class="testimonial-text font-alt">I should be incapable of drawing a
+                                        single stroke at the present moment; and yet I feel that I never was a greater
+                                        artist than now.
+                                    </blockquote>
                                 </div>
                             </div>
                             <div class="row">
@@ -839,7 +878,10 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                             </div>
                             <div class="row">
                                 <div class="col-sm-8 col-sm-offset-2">
-                                    <blockquote class="testimonial-text font-alt">I am so happy, my dear friend, so absorbed in the exquisite sense of mere tranquil existence, that I neglect my talents.</blockquote>
+                                    <blockquote class="testimonial-text font-alt">I am so happy, my dear friend, so
+                                        absorbed in the exquisite sense of mere tranquil existence, that I neglect my
+                                        talents.
+                                    </blockquote>
                                 </div>
                             </div>
                             <div class="row">
@@ -870,20 +912,26 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                         <form id="contactForm" role="form" method="post" action="php/contact.php">
                             <div class="form-group">
                                 <label class="sr-only" for="name">Name</label>
-                                <input class="form-control" type="text" id="name" name="name" placeholder="Your Name*" required="required" data-validation-required-message="Please enter your name."/>
+                                <input class="form-control" type="text" id="name" name="name" placeholder="Your Name*"
+                                       required="required" data-validation-required-message="Please enter your name."/>
                                 <p class="help-block text-danger"></p>
                             </div>
                             <div class="form-group">
                                 <label class="sr-only" for="email">Email</label>
-                                <input class="form-control" type="email" id="email" name="email" placeholder="Your Email*" required="required" data-validation-required-message="Please enter your email address."/>
+                                <input class="form-control" type="email" id="email" name="email"
+                                       placeholder="Your Email*" required="required"
+                                       data-validation-required-message="Please enter your email address."/>
                                 <p class="help-block text-danger"></p>
                             </div>
                             <div class="form-group">
-                                <textarea class="form-control" rows="7" id="message" name="message" placeholder="Your Message*" required="required" data-validation-required-message="Please enter your message."></textarea>
+                                <textarea class="form-control" rows="7" id="message" name="message"
+                                          placeholder="Your Message*" required="required"
+                                          data-validation-required-message="Please enter your message."></textarea>
                                 <p class="help-block text-danger"></p>
                             </div>
                             <div class="text-center">
-                                <button class="btn btn-block btn-round btn-d" id="cfsubmit" type="submit">Submit</button>
+                                <button class="btn btn-block btn-round btn-d" id="cfsubmit" type="submit">Submit
+                                </button>
                             </div>
                         </form>
                         <div class="ajax-response font-alt" id="contactFormResponse"></div>
@@ -891,11 +939,13 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                     <div class="col-sm-4">
                         <div class="alt-features-item mt-0">
                             <div class="alt-features-icon"><span class="icon-megaphone"></span></div>
-                            <h3 class="alt-features-title font-alt">Where to meet</h3>Titan Company<br/>23 Greate Street<br/>Los Angeles, 12345 LS
+                            <h3 class="alt-features-title font-alt">Where to meet</h3>Titan Company<br/>23 Greate Street<br/>Los
+                            Angeles, 12345 LS
                         </div>
                         <div class="alt-features-item mt-xs-60">
                             <div class="alt-features-icon"><span class="icon-map"></span></div>
-                            <h3 class="alt-features-title font-alt">Say Hello</h3>Email: somecompany@example.com<br/>Phone: +1 234 567 89 10
+                            <h3 class="alt-features-title font-alt">Say Hello</h3>Email: somecompany@example.com<br/>Phone:
+                            +1 234 567 89 10
                         </div>
                     </div>
                 </div>
@@ -907,7 +957,8 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                     <div class="col-sm-3">
                         <div class="widget">
                             <h5 class="widget-title font-alt">About Titan</h5>
-                            <p>The languages only differ in their grammar, their pronunciation and their most common words.</p>
+                            <p>The languages only differ in their grammar, their pronunciation and their most common
+                                words.</p>
                             <p>Phone: +1 234 567 89 10</p>Fax: +1 234 567 89 10
                             <p>Email:<a href="#">somecompany@example.com</a></p>
                         </div>
@@ -941,16 +992,19 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
                             <h5 class="widget-title font-alt">Popular Posts</h5>
                             <ul class="widget-posts">
                                 <li class="clearfix">
-                                    <div class="widget-posts-image"><a href="#"><img src="assets/images/rp-1.jpg" alt="Post Thumbnail"/></a></div>
+                                    <div class="widget-posts-image"><a href="#"><img src="assets/images/rp-1.jpg"
+                                                                                     alt="Post Thumbnail"/></a></div>
                                     <div class="widget-posts-body">
                                         <div class="widget-posts-title"><a href="#">Designer Desk Essentials</a></div>
                                         <div class="widget-posts-meta">23 january</div>
                                     </div>
                                 </li>
                                 <li class="clearfix">
-                                    <div class="widget-posts-image"><a href="#"><img src="assets/images/rp-2.jpg" alt="Post Thumbnail"/></a></div>
+                                    <div class="widget-posts-image"><a href="#"><img src="assets/images/rp-2.jpg"
+                                                                                     alt="Post Thumbnail"/></a></div>
                                     <div class="widget-posts-body">
-                                        <div class="widget-posts-title"><a href="#">Realistic Business Card Mockup</a></div>
+                                        <div class="widget-posts-title"><a href="#">Realistic Business Card Mockup</a>
+                                        </div>
                                         <div class="widget-posts-meta">15 February</div>
                                     </div>
                                 </li>
@@ -965,10 +1019,13 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
             <div class="container">
                 <div class="row">
                     <div class="col-sm-6">
-                        <p class="copyright font-alt">&copy; 2017&nbsp;<a href="index.html">TitaN</a>, All Rights Reserved</p>
+                        <p class="copyright font-alt">&copy; 2017&nbsp;<a href="index.html">TitaN</a>, All Rights
+                            Reserved</p>
                     </div>
                     <div class="col-sm-6">
-                        <div class="footer-social-links"><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-skype"></i></a>
+                        <div class="footer-social-links"><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i
+                                        class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-dribbble"></i></a><a
+                                    href="#"><i class="fa fa-skype"></i></a>
                         </div>
                     </div>
                 </div>
@@ -981,8 +1038,9 @@ add_filter( 'wp_nav_menu_objects', 'wpdocs_add_menu_parent_class' );
 JavaScripts
 =============================================
 -->
-<script src="{{public_url('assets/lib/jquery/dist/jquery.js')}}"></script>
-<script src="{{public_url('assets/lib/bootstrap/dist/js/bootstrap.min.js')}}"></script>
+<!--<script src="{{public_url('assets/lib/jquery/dist/jquery.js')}}"></script>
+<script src="{{public_url('assets/lib/bootstrap/dist/js/bootstrap.min.js')}}"></script>-->
+<script src="{{public_url('js/app.js')}}"></script>
 <script src="{{public_url('assets/lib/wow/dist/wow.js')}}"></script>
 <script src="{{public_url('assets/lib/jquery.mb.ytplayer/dist/jquery.mb.YTPlayer.js')}}"></script>
 <script src="{{public_url('assets/lib/isotope/dist/isotope.pkgd.js')}}"></script>
@@ -994,7 +1052,6 @@ JavaScripts
 <script src="{{public_url('assets/lib/simple-text-rotator/jquery.simple-text-rotator.min.js')}}"></script>
 <script src="{{public_url('assets/js/plugins.js')}}"></script>
 <script src="{{public_url('assets/js/main.js')}}"></script>
-<script src="{{public_url('js/app.js')}}"></script>
 
 @yield('footer')
 <?php wp_footer();?>
