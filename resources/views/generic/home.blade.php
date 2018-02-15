@@ -53,7 +53,7 @@
     </section>
     <section class="module pt-0 pb-0" id="about">
         <div class="row position-relative m-0">
-            <div class="col-xs-12 col-md-6 side-image" data-background="assets/images/section-14.jpg"></div>
+            <div class="col-xs-12 col-md-6 side-image" data-background="{{public_url('assets/images/section-14.jpg')}}"></div>
             <div class="col-xs-12 col-md-6 col-md-offset-6 side-image-text">
                 <div class="row">
                     <div class="col-sm-12">
@@ -99,7 +99,7 @@
             </div>
             <ul class="works-grid works-grid-gut works-grid-3 works-hover-d" id="works-grid">
                 <li class="work-item illustration webdesign"><a href="portfolio_single_featured_image1.html">
-                        <div class="work-image"><img src="assets/images/portfolio/grid-portfolio1.jpg"
+                        <div class="work-image"><img src="{{public_url('assets/images/portfolio/grid-portfolio1.jpg')}}"
                                                      alt="Portfolio Item"/></div>
                         <div class="work-caption font-alt">
                             <h3 class="work-title">Corporate Identity</h3>
@@ -107,7 +107,7 @@
                         </div>
                     </a></li>
                 <li class="work-item marketing photography"><a href="portfolio_single_featured_image2.html">
-                        <div class="work-image"><img src="assets/images/portfolio/grid-portfolio2.jpg"
+                        <div class="work-image"><img src="{{public_url('assets/images/portfolio/grid-portfolio2.jpg')}}"
                                                      alt="Portfolio Item"/></div>
                         <div class="work-caption font-alt">
                             <h3 class="work-title">Bag MockUp</h3>
@@ -115,7 +115,7 @@
                         </div>
                     </a></li>
                 <li class="work-item illustration photography"><a href="portfolio_single_featured_slider1.html">
-                        <div class="work-image"><img src="assets/images/portfolio/grid-portfolio3.jpg"
+                        <div class="work-image"><img src="{{public_url('assets/images/portfolio/grid-portfolio3.jpg')}}"
                                                      alt="Portfolio Item"/></div>
                         <div class="work-caption font-alt">
                             <h3 class="work-title">Disk Cover</h3>
@@ -123,7 +123,7 @@
                         </div>
                     </a></li>
                 <li class="work-item marketing photography"><a href="portfolio_single_featured_slider2.htmll">
-                        <div class="work-image"><img src="assets/images/portfolio/grid-portfolio4.jpg"
+                        <div class="work-image"><img src="{{public_url('assets/images/portfolio/grid-portfolio4.jpg')}}"
                                                      alt="Portfolio Item"/></div>
                         <div class="work-caption font-alt">
                             <h3 class="work-title">Business Card</h3>
@@ -131,7 +131,7 @@
                         </div>
                     </a></li>
                 <li class="work-item illustration webdesign"><a href="portfolio_single_featured_video1.html">
-                        <div class="work-image"><img src="assets/images/portfolio/grid-portfolio5.jpg"
+                        <div class="work-image"><img src="{{public_url('assets/images/portfolio/grid-portfolio5.jpg')}}"
                                                      alt="Portfolio Item"/></div>
                         <div class="work-caption font-alt">
                             <h3 class="work-title">Web Design</h3>
@@ -139,7 +139,7 @@
                         </div>
                     </a></li>
                 <li class="work-item marketing webdesign"><a href="portfolio_single_featured_video2.html">
-                        <div class="work-image"><img src="assets/images/portfolio/grid-portfolio6.jpg"
+                        <div class="work-image"><img src="{{public_url('assets/images/portfolio/grid-portfolio6.jpg')}}"
                                                      alt="Portfolio Item"/></div>
                         <div class="work-caption font-alt">
                             <h3 class="work-title">Paper clip</h3>
@@ -179,7 +179,7 @@
             <div class="row">
                 <div class="mb-sm-20 wow fadeInUp col-md-4 col-sm-6 col-xs-12">
                     <div class="team-item">
-                        <div class="team-image"><img src="assets/images/team-1.jpg" alt="Member Photo"/>
+                        <div class="team-image"><img src="{{public_url('assets/images/team-1.jpg')}}" alt="Member Photo"/>
                             <div class="team-detail">
                                 <h5 class="font-alt">Hi all</h5>
                                 <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus,
@@ -198,7 +198,7 @@
                 </div>
                 <div class="mb-sm-20 wow fadeInUp col-md-4 col-sm-6 col-xs-12">
                     <div class="team-item">
-                        <div class="team-image"><img src="assets/images/team-2.jpg" alt="Member Photo"/>
+                        <div class="team-image"><img src="{{public_url('assets/images/team-2.jpg')}}" alt="Member Photo"/>
                             <div class="team-detail">
                                 <h5 class="font-alt">Good day</h5>
                                 <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus,
@@ -217,7 +217,7 @@
                 </div>
                 <div class="mb-sm-20 wow fadeInUp col-md-4 col-sm-6 col-xs-12">
                     <div class="team-item">
-                        <div class="team-image"><img src="assets/images/team-4.jpg" alt="Member Photo"/>
+                        <div class="team-image"><img src="{{public_url('assets/images/team-4.jpg')}}" alt="Member Photo"/>
                             <div class="team-detail">
                                 <h5 class="font-alt">Yes, it's me</h5>
                                 <p class="font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit lacus,
