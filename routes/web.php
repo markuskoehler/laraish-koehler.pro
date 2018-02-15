@@ -47,7 +47,7 @@
 | 404
 */
 
-//Route::any('home', 'Generic\Home@index');
+Route::any('home', 'Generic\Home@index');
 Route::any('single', 'Generic\Single@index');
 Route::any('page', 'Generic\Page@index');
 Route::any('404', 'Generic\NotFound@index');
