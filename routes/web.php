@@ -47,7 +47,13 @@
 | 404
 */
 
-Route::any('home', 'Generic\Home@index');
+// home page
+Route::any('front_page', 'Generic\Home@index');
+// blog page
+Route::any('home', 'Generic\Blog@index');
+// blog post
 Route::any('single', 'Generic\Single@index');
+// page
 Route::any('page', 'Generic\Page@index');
+// 404 page
 Route::any('404', 'Generic\NotFound@index');

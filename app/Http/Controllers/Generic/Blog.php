@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Generic;
 
 use App\Http\Controllers\Controller;
 
-class Home extends Controller
+class Blog extends Controller
 {
     public function index()
     {
@@ -12,6 +12,6 @@ class Home extends Controller
             //'version' => app()->version(),
         ];
 
-        return $this->view('generic.home', $data);
+        return $this->view('generic.blog', $data);
     }
 }
