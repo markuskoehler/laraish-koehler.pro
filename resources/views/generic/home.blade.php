@@ -1,14 +1,13 @@
 @extends('layouts.titan')
 
 @section('header')
-    <section class="home-section home-parallax home-fade home-full-height bg-dark-60 agency-page-header" id="home"
-             data-background="{{public_url('assets/images/agency/agency_bg.jpg')}}">
+    <section class="home-section home-parallax home-fade home-full-height bg-dark-60 agency-page-header" id="home">
         <div class="titan-caption">
             <div class="caption-content">
                 <div class="font-alt mb-30 titan-title-size-1">Grow your awesome idea</div>
-                <div class="font-alt mb-40 titan-title-size-3">I am a<br>
-                    <span class="rotate">Web Designer | Developer | Hosting Provider | Software Architect | Dev Team Leader</span><br>
-                    And what are you?
+                <div class="font-alt mb-40 titan-title-size-3">Welcome! I am a<br>
+                    <span class="rotate">Web Designer | Software Developer | Hosting Provider | Software Architect | Entrepreneur</span><br>
+                    How May I Help You?
                 </div>
                 <a class="section-scroll btn btn-border-w btn-circle" href="#about">Learn More</a>
             </div>
