@@ -545,8 +545,8 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-6">
-                        <p class="copyright font-alt">&copy; 2017&nbsp;<a href="index.html">TitaN</a>, All Rights
-                            Reserved</p>
+                        <p class="copyright font-alt">Copyright &copy; 2018&nbsp;<a href="{{url('')}}">Markus Koehler IT Services</a>, All Rights
+                            Reserved. Proudly leveraging WordPress and the Laravel Framework.</p>
                     </div>
                     <div class="col-sm-6">
                         <div class="footer-social-links"><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i
