@@ -157,9 +157,9 @@
             var topScroll = $(window).scrollTop();
             if (navbar.length > 0 && homeSection.length > 0) {
                 if(topScroll >= navHeight) {
-                    navbar.removeClass('navbar-transparent');
+                    navbar.removeClass('navbar-transparent text-dark');
                 } else {
-                    navbar.addClass('navbar-transparent');
+                    navbar.addClass('navbar-transparent text-dark');
                 }
             }
         }
