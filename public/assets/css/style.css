@@ -859,7 +859,7 @@ a {
 
 a:hover, a:focus {
   text-decoration: none;
-  color: #aaa;
+  color: #999 !important;
   outline: 0;
 }
 
@@ -1260,6 +1260,10 @@ General Styles - Owlcarousel
   border: 0;
   padding: 0;
   box-shadow: none;
+}
+
+.navbar-custom.text-dark .dropdown-menu {
+    background: rgba(225, 225, 225, 0.9);
 }
 
 .navbar-custom .navbar-brand {
